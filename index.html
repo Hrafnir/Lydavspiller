@@ -1,205 +1,53 @@
-/* Version: #2 */
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Min Lydspiller</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Klassens Lydspiller</h1>
+        </header>
 
-/* === GLOBALE INNSTILLINGER === */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    user-select: none; /* Hindrer at tekst markeres ved feiltrykk på iPad */
-    -webkit-tap-highlight-color: transparent; /* Fjerner standard blå blink på iOS ved trykk */
-}
+        <main>
+            <section class="file-loader-section">
+                <label for="audio-upload" class="upload-button">
+                    📂 Hent lydfiler fra iPad
+                </label>
+                <input type="file" id="audio-upload" accept="audio/mp3, audio/wav" multiple style="display: none;">
+            </section>
 
-body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
-}
+            <section class="player-section">
+                <div class="now-playing">
+                    <span id="current-track-name">Ingen fil valgt</span>
+                </div>
 
-.app-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    padding: 30px;
-}
+                <div class="controls">
+                    <button id="btn-play" class="control-btn play-btn" disabled>▶️ Spill</button>
+                    <button id="btn-pause" class="control-btn pause-btn" disabled>⏸️ Pause</button>
+                    <button id="btn-stop" class="control-btn stop-btn" disabled>⏹️ Stopp</button>
+                </div>
 
-/* === HEADER === */
-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
+                <div class="volume-controls">
+                    <button id="btn-vol-down" class="vol-btn">🔉 Volum -</button>
+                    <span id="volume-display">100%</span>
+                    <button id="btn-vol-up" class="vol-btn">🔊 Volum +</button>
+                </div>
+            </section>
 
-h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-}
+            <section class="playlist-section">
+                <h2>Spilleliste</h2>
+                <ul id="playlist" class="playlist">
+                    <li class="empty-list-msg">Ingen filer lastet inn enda. Trykk på knappen over for å velge filer.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
 
-h2 {
-    font-size: 1.8rem;
-    color: #34495e;
-    margin-bottom: 15px;
-    border-bottom: 3px solid #ecf0f1;
-    padding-bottom: 5px;
-}
-
-/* === FIL-LASTER === */
-.file-loader-section {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.upload-button {
-    display: inline-block;
-    background-color: #3498db;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    padding: 20px 40px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.upload-button:active {
-    transform: scale(0.95);
-    background-color: #2980b9;
-}
-
-/* === SPILLER === */
-.player-section {
-    background-color: #ecf0f1;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 40px;
-    text-align: center;
-}
-
-.now-playing {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 25px;
-    color: #2c3e50;
-    min-height: 40px; /* Sikrer at layout ikke hopper når teksten endres */
-    word-wrap: break-word;
-}
-
-/* KONTROLLER (Knapper) */
-.controls {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    flex-wrap: wrap; /* Sørger for at de brytes pent på mindre skjermer */
-}
-
-.control-btn {
-    font-size: 1.5rem;
-    font-weight: bold;
-    padding: 20px 30px;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    transition: transform 0.1s, opacity 0.3s;
-}
-
-.control-btn:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-.control-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-.play-btn { background-color: #2ecc71; } /* Grønn */
-.pause-btn { background-color: #f1c40f; color: #333; } /* Gul */
-.stop-btn { background-color: #e74c3c; } /* Rød */
-
-/* VOLUMKONTROLLER */
-.volume-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    display: inline-flex;
-}
-
-#volume-display {
-    font-size: 1.4rem;
-    font-weight: bold;
-    min-width: 60px;
-    text-align: center;
-}
-
-.vol-btn {
-    font-size: 1.2rem;
-    padding: 15px 25px;
-    border: none;
-    background-color: #95a5a6;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.vol-btn:active {
-    background-color: #7f8c8d;
-    transform: scale(0.95);
-}
-
-/* === SPILLELISTE === */
-.playlist-section {
-    background-color: #fff;
-}
-
-.playlist {
-    list-style-type: none;
-    border: 2px solid #ecf0f1;
-    border-radius: 10px;
-    overflow: hidden; /* Holder hjørnene runde selv med innhold */
-}
-
-.playlist li {
-    padding: 20px;
-    font-size: 1.3rem;
-    border-bottom: 1px solid #ecf0f1;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-}
-
-.playlist li:last-child {
-    border-bottom: none;
-}
-
-/* Tilstander for listeelementer */
-.playlist li:active {
-    background-color: #e8f4f8;
-}
-
-.playlist li.playing {
-    background-color: #d1f2eb;
-    font-weight: bold;
-    color: #117a65;
-    border-left: 6px solid #2ecc71; /* Tydelig visuell indikator for barna */
-}
-
-.empty-list-msg {
-    text-align: center;
-    color: #7f8c8d;
-    font-style: italic;
-    padding: 30px !important;
-    cursor: default !important;
-}
-
-/* Version: #2 */
+    <audio id="audio-player" style="display: none;"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
