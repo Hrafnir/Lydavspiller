@@ -1,4 +1,4 @@
-/* Version: #3 */
+/* Version: #4 */
 
 // === SEKSJON: Variabler og Elementer ===
 const audioPlayer = document.getElementById('audio-player');
@@ -12,7 +12,7 @@ const btnVolUp = document.getElementById('btn-vol-up');
 const btnVolDown = document.getElementById('btn-vol-down');
 const volumeDisplay = document.getElementById('volume-display');
 
-let audioFiles = []; // Array for å lagre fil-objektene
+let audioFiles = []; // Array for å lagre fil-objektene (både lokale og fra GitHub)
 let currentFileIndex = -1; // -1 betyr at ingen fil er valgt
 let currentVolume = 1.0; // Standard volum er 100%
 
@@ -24,10 +24,49 @@ audioPlayer.volume = currentVolume;
 volumeDisplay.textContent = `${Math.round(currentVolume * 100)}%`;
 
 
-// === SEKSJON: Filopplasting ===
+// === SEKSJON: Hent Lærerens Spilleliste (GitHub) ===
+async function fetchTeacherPlaylist() {
+    console.log("=== SEKSJON: Nettverkshenting ===");
+    console.log("Søker etter spilleliste.json på serveren...");
+    
+    try {
+        // Forsøker å laste inn JSON-filen
+        const response = await fetch('spilleliste.json');
+        
+        if (!response.ok) {
+            console.log("Fant ingen spilleliste.json (eller fikk nettverksfeil). Dette er helt greit, appen fungerer manuelt.");
+            return; // Avbryter stille hvis filen ikke finnes
+        }
+
+        const data = await response.json();
+        console.log(`Suksess! Fant spilleliste.json. Laster inn ${data.length} filer...`);
+
+        // Legger de eksterne filene inn i hovedlisten
+        data.forEach(filename => {
+            audioFiles.push({
+                name: filename,
+                url: `lydfiler/${filename}`, // Peker automatisk til lydfiler-mappen
+                isExternal: true // Markør for å skille dem fra lokale iPad-filer
+            });
+            console.log(`Lagt til lærerens fil i minnet: ${filename}`);
+        });
+
+        // Oppdaterer visningen for brukeren
+        renderPlaylist();
+
+    } catch (error) {
+        console.error("En feil oppstod ved lesing av spilleliste.json (mulig skrivefeil i JSON-filen?):", error);
+    }
+}
+
+// Kjør hentingen umiddelbart når scriptet starter
+fetchTeacherPlaylist();
+
+
+// === SEKSJON: Lokal Filopplasting (iPad) ===
 audioUpload.addEventListener('change', (event) => {
     console.log("=== SEKSJON: Filopplasting ===");
-    console.log("Bruker har trigget fil-dialogen.");
+    console.log("Bruker har trigget fil-dialogen på iPaden.");
     
     const files = event.target.files;
     if (files.length === 0) {
@@ -35,25 +74,28 @@ audioUpload.addEventListener('change', (event) => {
         return;
     }
 
-    console.log(`Laster inn ${files.length} nye fil(er)...`);
+    console.log(`Laster inn ${files.length} nye lokale fil(er)...`);
 
-    // Frigi gamle URL-er fra minnet for å forhindre minnelekkasjer i nettleseren
+    // Frigi gamle lokale URL-er fra minnet for å forhindre minnelekkasjer
     audioFiles.forEach(fileObj => {
-        if (fileObj.url) {
+        if (!fileObj.isExternal && fileObj.url) {
             URL.revokeObjectURL(fileObj.url);
-            console.log(`Frigitt gammelt minne for: ${fileObj.file.name}`);
+            console.log(`Frigitt gammelt minne for lokal fil: ${fileObj.name}`);
         }
     });
 
-    // Nullstill arrayen og fyll på med nye filer
-    audioFiles = [];
+    // Fjern gamle lokale filer fra arrayen, men BEHOLD lærerens eksterne filer
+    audioFiles = audioFiles.filter(fileObj => fileObj.isExternal);
+
+    // Fyll på med de nye lokale filene
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        console.log(`Behandler fil ${i + 1} av ${files.length}: ${file.name} (Type: ${file.type})`);
+        console.log(`Behandler lokal fil ${i + 1} av ${files.length}: ${file.name} (Type: ${file.type})`);
         
         audioFiles.push({
-            file: file,
-            url: URL.createObjectURL(file) // Skaper en lokal, midlertidig lenke til filen på iPaden
+            name: file.name,
+            url: URL.createObjectURL(file), // Skaper en lokal, midlertidig lenke til filen
+            isExternal: false
         });
     }
 
@@ -76,12 +118,15 @@ function renderPlaylist() {
 
     audioFiles.forEach((fileObj, index) => {
         const li = document.createElement('li');
-        li.textContent = `🎵 ${fileObj.file.name}`;
+        
+        // Viser et litt annet ikon hvis det er en av lærerens filer vs elevens egne
+        const icon = fileObj.isExternal ? '☁️' : '🎵';
+        li.textContent = `${icon} ${fileObj.name}`;
         li.dataset.index = index;
 
         // Klikk-hendelse for hvert element i spillelisten
         li.addEventListener('click', () => {
-            console.log(`Bruker trykket på spor i spillelisten: ${fileObj.file.name} (Indeks: ${index})`);
+            console.log(`Bruker trykket på spor i spillelisten: ${fileObj.name} (Indeks: ${index})`);
             loadTrack(index);
             playTrack();
         });
@@ -114,10 +159,10 @@ function loadTrack(index) {
 
     currentFileIndex = index;
     const fileObj = audioFiles[index];
-    console.log(`Laster spor inn i audio-elementet: ${fileObj.file.name}`);
+    console.log(`Laster spor inn i audio-elementet: ${fileObj.name} (Ekstern: ${fileObj.isExternal})`);
 
     audioPlayer.src = fileObj.url;
-    currentTrackNameEl.textContent = fileObj.file.name;
+    currentTrackNameEl.textContent = fileObj.name;
 
     updatePlaylistUI();
     enableControls(true);
@@ -178,7 +223,7 @@ btnStop.addEventListener('click', stopTrack);
 audioPlayer.addEventListener('ended', () => {
     console.log("=== SEKSJON: Spor Ferdig ===");
     console.log("Lydsporet er ferdig avspilt automatisk.");
-    stopTrack(); // Stopper sirkuleringen. Kan utvides til "neste sang" senere hvis ønskelig.
+    stopTrack(); // Stopper sirkuleringen.
 });
 
 
@@ -202,4 +247,4 @@ function updateVolume(change) {
 btnVolUp.addEventListener('click', () => updateVolume(0.1));
 btnVolDown.addEventListener('click', () => updateVolume(-0.1));
 
-/* Version: #3 */
+/* Version: #4 */
