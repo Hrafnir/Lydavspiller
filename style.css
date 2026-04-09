@@ -1,4 +1,4 @@
-/* Version: #2 */
+/* Version: #5 */
 
 /* === GLOBALE INNSTILLINGER === */
 * {
@@ -11,8 +11,8 @@
 
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
+    background-color: #121212; /* Mørk bakgrunn */
+    color: #e0e0e0; /* Lys tekst for behagelig lesbarhet */
     line-height: 1.6;
     padding: 20px;
 }
@@ -20,9 +20,9 @@ body {
 .app-container {
     max-width: 800px;
     margin: 0 auto;
-    background-color: #ffffff;
+    background-color: #1e1e1e; /* Mørkegrå boks som løfter innholdet */
     border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5); /* Mørkere skygge for dybde */
     padding: 30px;
 }
 
@@ -34,14 +34,14 @@ header {
 
 h1 {
     font-size: 2.5rem;
-    color: #2c3e50;
+    color: #ffffff; /* Hvit tittel på mørk bakgrunn */
 }
 
 h2 {
     font-size: 1.8rem;
-    color: #34495e;
+    color: #f5f5f5;
     margin-bottom: 15px;
-    border-bottom: 3px solid #ecf0f1;
+    border-bottom: 3px solid #333333; /* Diskret, mørk delelinje */
     padding-bottom: 5px;
 }
 
@@ -61,7 +61,7 @@ h2 {
     border-radius: 12px;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .upload-button:active {
@@ -71,7 +71,7 @@ h2 {
 
 /* === SPILLER === */
 .player-section {
-    background-color: #ecf0f1;
+    background-color: #2a2a2a; /* Markerer spillerområdet med en litt lysere grå */
     border-radius: 12px;
     padding: 25px;
     margin-bottom: 40px;
@@ -82,7 +82,7 @@ h2 {
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 25px;
-    color: #2c3e50;
+    color: #64ffda; /* Lys turkis/mint-farge som popper i mørkt tema */
     min-height: 40px; /* Sikrer at layout ikke hopper når teksten endres */
     word-wrap: break-word;
 }
@@ -104,7 +104,7 @@ h2 {
     border-radius: 12px;
     color: white;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     transition: transform 0.1s, opacity 0.3s;
 }
 
@@ -113,13 +113,13 @@ h2 {
 }
 
 .control-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.3; /* Gjør deaktiverte knapper litt mørkere i dark mode */
     cursor: not-allowed;
     box-shadow: none;
 }
 
 .play-btn { background-color: #2ecc71; } /* Grønn */
-.pause-btn { background-color: #f1c40f; color: #333; } /* Gul */
+.pause-btn { background-color: #f1c40f; color: #121212; } /* Gul, med mørk tekst for høy kontrast */
 .stop-btn { background-color: #e74c3c; } /* Rød */
 
 /* VOLUMKONTROLLER */
@@ -128,10 +128,11 @@ h2 {
     justify-content: center;
     align-items: center;
     gap: 20px;
-    background-color: #fff;
+    background-color: #1e1e1e; /* Matcher app-container for en ren overflate */
     padding: 15px;
     border-radius: 10px;
     display: inline-flex;
+    border: 1px solid #333333; /* Diskret ramme */
 }
 
 #volume-display {
@@ -139,31 +140,32 @@ h2 {
     font-weight: bold;
     min-width: 60px;
     text-align: center;
+    color: #e0e0e0;
 }
 
 .vol-btn {
     font-size: 1.2rem;
     padding: 15px 25px;
     border: none;
-    background-color: #95a5a6;
+    background-color: #444444; /* Grå knapper som passer mørkt tema */
     color: white;
     border-radius: 8px;
     cursor: pointer;
 }
 
 .vol-btn:active {
-    background-color: #7f8c8d;
+    background-color: #333333;
     transform: scale(0.95);
 }
 
 /* === SPILLELISTE === */
 .playlist-section {
-    background-color: #fff;
+    background-color: #1e1e1e;
 }
 
 .playlist {
     list-style-type: none;
-    border: 2px solid #ecf0f1;
+    border: 2px solid #333333;
     border-radius: 10px;
     overflow: hidden; /* Holder hjørnene runde selv med innhold */
 }
@@ -171,11 +173,12 @@ h2 {
 .playlist li {
     padding: 20px;
     font-size: 1.3rem;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid #333333;
     cursor: pointer;
     transition: background-color 0.2s;
     display: flex;
     align-items: center;
+    color: #cccccc;
 }
 
 .playlist li:last-child {
@@ -183,23 +186,27 @@ h2 {
 }
 
 /* Tilstander for listeelementer */
+.playlist li:hover {
+    background-color: #252525; /* Lett highlight for mus-brukere */
+}
+
 .playlist li:active {
-    background-color: #e8f4f8;
+    background-color: #2a2a2a; /* Feedback ved trykk */
 }
 
 .playlist li.playing {
-    background-color: #d1f2eb;
+    background-color: #1a2f24; /* Mørkegrønn bakgrunn */
     font-weight: bold;
-    color: #117a65;
+    color: #2ecc71; /* Tydelig grønn tekst */
     border-left: 6px solid #2ecc71; /* Tydelig visuell indikator for barna */
 }
 
 .empty-list-msg {
     text-align: center;
-    color: #7f8c8d;
+    color: #777777;
     font-style: italic;
     padding: 30px !important;
     cursor: default !important;
 }
 
-/* Version: #2 */
+/* Version: #5 */
